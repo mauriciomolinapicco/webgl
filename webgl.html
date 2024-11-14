@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WebGL Example</title>
+    <style>
+      canvas { width: 100%; height: 100%; }
+    </style>
+  </head>
+  <body>
+    <canvas id="webgl-canvas" width="500" height="500"></canvas>
+    <script>
+      // Obtener el contexto WebGL
+      var canvas = document.getElementById("webgl-canvas");
+      var gl = canvas.getContext("webgl");
+
+      if (!gl) {
+        console.log("WebGL no está disponible");
+      }
+
+      // Definir los vértices del triángulo
+      var vertices = new Float32Array([
+        0.0,  0.5,  0.0,  // Vértice superior
+       -0.5, -0.5,  0.0,  // Vértice inferior izquierdo
+        0.5, -0.5,  0.0   // Vértice inferior derecho
+      ]);
+
+      // Crear el buffer para los vértices
+      var vertexBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+      gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+      // Definir el shader de vértices
+      var vertexShaderSource = `
+        attribute vec3 coordinates;
+        void main(void) {
+          gl_Position = vec4(coordinates, 1.0);
+        }`;
+
+      var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+      gl.shaderSource(vertexShader, vertexShaderSource);
+      gl.compileShader(vertexShader);
+
+      // Definir el shader de fragmentos (color)
+      var fragmentShaderSource = `
+        void main(void) {
+          gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); // Color rojo
+        }`;
+
+      var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+      gl.shaderSource(fragmentShader, fragmentShaderSource);
+      gl.compileShader(fragmentShader);
+
+      // Crear el programa y enlazar los shaders
+      var shaderProgram = gl.createProgram();
+      gl.attachShader(shaderProgram, vertexShader);
+      gl.attachShader(shaderProgram, fragmentShader);
+      gl.linkProgram(shaderProgram);
+      gl.useProgram(shaderProgram);
+
+      // Asociar el buffer de vértices con el shader
+      var coord = gl.getAttribLocation(shaderProgram, "coordinates");
+      gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(coord);
+
+      // Limpiar el fondo y dibujar el triángulo
+      gl.clearColor(0.8, 0.8, 0.8, 1.0); // Color de fondo
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    </script>
+  </body>
+</html>
